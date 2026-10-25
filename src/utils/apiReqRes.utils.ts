@@ -1,0 +1,55 @@
+import { IGlobalErrorResponse, TQueryParam, TResponseRedux } from '@/types/apiResponse.types';
+import { toast } from 'sonner';
+
+export const formatGlobalErrorResponse = (error: any) => {
+  const serverResponse = error?.data as any;
+
+  return {
+    success: serverResponse?.success ?? false,
+    message: serverResponse?.data?.message || serverResponse?.message || 'Something went wrong',
+    error: serverResponse?.data?.error || 'Error',
+    statusCode: serverResponse?.data?.statusCode || error?.status || 500,
+  };
+};
+
+export const constructQueryParams = (args: TQueryParam[] | undefined): URLSearchParams => {
+  const params = new URLSearchParams();
+  if (args) {
+    args.forEach((item) => {
+      params.append(item.name, item.value as string);
+    });
+  }
+  return params;
+};
+
+export const commonTransformResponse = <T>(response: TResponseRedux<T>) => {
+  return {
+    data: response.data,
+    meta: response.meta,
+  };
+};
+
+export const catchAsyncMutation = async <T>(
+  mutationPromise: Promise<T>,
+  onSuccess?: (res: T) => void,
+  onError?: (err: IGlobalErrorResponse) => void,
+): Promise<T | null> => {
+  try {
+    const res = await mutationPromise;
+
+    if ((res as any)?.success) {
+      if (onSuccess) onSuccess(res);
+    }
+
+    return res;
+  } catch (err) {
+    const error = err as any;
+    toast.error(error?.data?.message || 'Something went wrong!');
+
+    if (onError) {
+      onError(error);
+    }
+
+    return null;
+  }
+};
