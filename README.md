@@ -33,7 +33,7 @@ Ensure you have the following installed:
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/Arnab-Gupta11/project_review_frontend.git
 cd project_review_frontend
 ```
 
